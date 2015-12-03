@@ -326,6 +326,7 @@ page_fault_handler(struct Trapframe *tf)
 
 	// LAB 3: Your code here.
     if ((tf->tf_cs & 3) != 3) {
+        cprintf("vault_va=%x\n", fault_va);
         panic("kernel page fault");
         return;
     }

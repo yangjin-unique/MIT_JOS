@@ -29,20 +29,37 @@ sched_yield(void)
 	// below to halt the cpu.
 
 	// LAB 4: Your code here.
+    cprintf("cpu %d: run sched_yield\n", cpunum());
+#if 1
     struct Env *new_env = NULL;
-    int32_t start_id = (ENVX(curenv->env_id) + 1) % NENV; 
-    while (start_id != ENVX(curenv->env_id)) {
-        if (envs[start_id].env_status == ENV_RUNNABLE) {
-            new_env = &envs[start_id]; 
-            break;
+    int32_t start_id = 0, i;
+    
+    if (curenv == NULL) {
+        for (i = 0; i < NENV; i++) {
+            if (envs[i].env_status == ENV_RUNNABLE) {
+                new_env = &envs[i];
+                break;
+            }
         }
-        start_id = (start_id + 1) % NENV;
+    }
+    else {
+        start_id = (ENVX(curenv->env_id) + 1) % NENV;
+        while (start_id != ENVX(curenv->env_id)) {
+            if (envs[start_id].env_status == ENV_RUNNABLE) {
+                new_env = &envs[start_id]; 
+                break;
+            }
+            start_id = (start_id + 1) % NENV;
+        }
     }
     if (new_env == NULL && curenv->env_status == ENV_RUNNING) {
         new_env = curenv;
     }
-    if (new_env != NULL)
+    if (new_env != NULL) {
+        cprintf("cpu %d sched_yield: run user env=%d\n",cpunum(), ENVX(new_env->env_id));
         env_run(new_env);
+    }
+#endif
 	// sched_halt never returns
 	sched_halt();
 }
