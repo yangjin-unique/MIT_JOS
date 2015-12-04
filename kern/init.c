@@ -63,10 +63,14 @@ i386_init(void)
 	//ENV_CREATE(user_primes, ENV_TYPE_USER);
 #endif // TEST*
 
-	ENV_CREATE(user_yield, ENV_TYPE_USER);
-	ENV_CREATE(user_yield, ENV_TYPE_USER);
-	ENV_CREATE(user_yield, ENV_TYPE_USER);
+	//ENV_CREATE(user_yield, ENV_TYPE_USER);
+    //ENV_CREATE(user_yield, ENV_TYPE_USER);
+    //ENV_CREATE(user_yield, ENV_TYPE_USER);
+	//ENV_CREATE(user_dumbfork, ENV_TYPE_USER);
 	// Schedule and run the first user environment!
+    //cprintf("ken: pgfault test....\n");
+    //uintptr_t *p = (uintptr_t *)0x54;
+    //*p = 5;
 	sched_yield();
 }
 

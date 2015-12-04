@@ -90,6 +90,7 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	// that used the same slot in the envs[] array).
 	e = &envs[ENVX(envid)];
 	if (e->env_status == ENV_FREE || e->env_id != envid) {
+        cprintf("ken-envid2env: cpu %d, e->env_status=%d, e->env_id=%d, envid=%d\n", cpunum(), e->env_status, ENVX(e->env_id), ENVX(envid));
 		*env_store = 0;
 		return -E_BAD_ENV;
 	}
@@ -99,7 +100,10 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	// If checkperm is set, the specified environment
 	// must be either the current environment
 	// or an immediate child of the current environment.
+    assert(curenv);
 	if (checkperm && e != curenv && e->env_parent_id != curenv->env_id) {
+
+        cprintf("ken-envid2env: cpu %d, pa_id=%d, e_id=%d\n", cpunum(), e->env_parent_id, curenv->env_id);
 		*env_store = 0;
 		return -E_BAD_ENV;
 	}

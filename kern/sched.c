@@ -53,6 +53,7 @@ sched_yield(void)
         }
     }
     if (new_env == NULL && curenv->env_status == ENV_RUNNING) {
+        assert(curenv);
         new_env = curenv;
     }
     if (new_env != NULL) {
@@ -96,8 +97,10 @@ sched_halt(void)
 	xchg(&thiscpu->cpu_status, CPU_HALTED);
 
 	// Release the big kernel lock as if we were "leaving" the kernel
+    //cprintf("cpu %d sched_halt: before unlock\n",cpunum());
 	unlock_kernel();
-
+    
+    //cprintf("cpu %d sched_halt: after unlock\n",cpunum());
 	// Reset stack pointer, enable interrupts and then halt.
 	asm volatile (
 		"movl $0, %%ebp\n"
