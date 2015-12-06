@@ -52,7 +52,7 @@ sched_yield(void)
             start_id = (start_id + 1) % NENV;
         }
     }
-    if (new_env == NULL && curenv->env_status == ENV_RUNNING) {
+    if (new_env == NULL && curenv != NULL && curenv->env_status == ENV_RUNNING) {
         assert(curenv);
         new_env = curenv;
     }

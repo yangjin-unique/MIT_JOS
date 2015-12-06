@@ -176,7 +176,7 @@ sys_page_alloc(envid_t envid, void *va, int perm)
 
     if ((UTOP <= (uintptr_t) va) || (((uintptr_t)va % PGSIZE) != 0))
         return -E_INVAL;
-    if ((perm & (PTE_U | PTE_W)) != (PTE_W | PTE_U))
+    if ((perm & (PTE_U | PTE_P)) != (PTE_U | PTE_P))
         return -E_INVAL;
 
     if (envid2env(envid, &env, 1) < 0)
@@ -224,26 +224,37 @@ sys_page_map(envid_t srcenvid, void *srcva,
     pte_t *pte = NULL;
     struct PageInfo *page = NULL;
 
-    if ((UTOP <= (uintptr_t) srcva) || (((uintptr_t)srcva % PGSIZE) != 0))
+    if ((UTOP <= (uintptr_t) srcva) || (((uintptr_t)srcva % PGSIZE) != 0)) {
+        cprintf("srcva not valid\n");
         return -E_INVAL;
+    }
 
-    if ((perm & (PTE_U | PTE_W)) != (PTE_W | PTE_U))
+    if ((perm & (PTE_U | PTE_P)) != (PTE_P | PTE_U)) {
+        cprintf("perm not valid, perm=%x\n", perm);
         return -E_INVAL;
+    }
 
-    if (envid2env(srcenvid, &src_env, 1) < 0)
+    if (envid2env(srcenvid, &src_env, 1) < 0) {
         return -E_BAD_ENV;
+    }
 
-    if (envid2env(dstenvid, &dst_env, 1) < 0)
+    if (envid2env(dstenvid, &dst_env, 1) < 0) {
         return -E_BAD_ENV;
+    }
 
-    if ((page = page_lookup(src_env->env_pgdir, srcva, &pte)) == NULL)
+    if ((page = page_lookup(src_env->env_pgdir, srcva, &pte)) == NULL) {
+        cprintf("lookup failed\n");
         return -E_INVAL;
+    }
 
-    if ((perm & PTE_W) && !(*pte & PTE_W))
+    if ((perm & PTE_W) && !(*pte & PTE_W)) {
+        cprintf(" perm failed\n");
         return -E_INVAL;
+    }
     
-    if (page_insert(dst_env->env_pgdir, page, dstva, perm) < 0)
+    if (page_insert(dst_env->env_pgdir, page, dstva, perm) < 0) {
         return -E_NO_MEM;
+    }
 
     return 0;
 }
