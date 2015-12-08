@@ -31,7 +31,7 @@ pgfault(struct UTrapframe *utf)
     uintptr_t fault_va = ROUNDDOWN((uintptr_t) addr, PGSIZE);
 	pte_t pte = uvpt[PGNUM(fault_va)];
 	if(!(pte & PTE_P) || !(pte & PTE_COW))
-		panic("pgfault\n");
+		panic("pgfault fault_va==%08x, PTE_P=%d, PTE_COW=%d\n", (uintptr_t)addr, pte&PTE_P, pte&PTE_COW);
 	// Allocate a new page, map it at a temporary location (PFTEMP),
 	// copy the data from the old page to the new page, then move the new
 	// page to the old page's address.
@@ -83,12 +83,13 @@ duppage(envid_t envid, unsigned pn)
 		return r;
     }
 	
-	if(perm & PTE_COW)
+	if(perm & PTE_COW) {
 		if((r = sys_page_map(cur_evid, (void *) (pn*PGSIZE), 
 			cur_evid, (void *) (pn*PGSIZE), perm)) < 0) {
             panic("ken: duppage map error1 %e\n", r);
 			return r;
         }
+    }
 	return 0;
 }
 
